@@ -419,21 +419,22 @@ def post_process() -> None:
 
 
 def swap_face(source_face : Face, target_face : Face, temp_vision_frame : VisionFrame) -> VisionFrame:
+	print("swap_face()")
 	model_template = get_model_options().get('template')
 	model_size = get_model_options().get('size')
-	pixel_boost_size = unpack_resolution(state_manager.get_item('face_swapper_pixel_boost'))
+	pixel_boost_size = unpack_resolution("1024x1024")
 	pixel_boost_total = pixel_boost_size[0] // model_size[0]
 	crop_vision_frame, affine_matrix = warp_face_by_face_landmark_5(temp_vision_frame, target_face.landmark_set.get('5/68'), model_template, pixel_boost_size)
 	temp_vision_frames = []
 	crop_masks = []
 
-	if 'box' in state_manager.get_item('face_mask_types'):
-		box_mask = create_static_box_mask(crop_vision_frame.shape[:2][::-1], state_manager.get_item('face_mask_blur'), state_manager.get_item('face_mask_padding'))
+	if True: #'box' in state_manager.get_item('face_mask_types'):
+		box_mask = create_static_box_mask(crop_vision_frame.shape[:2][::-1], 0.3, tuple([ 0, 0, 0, 0 ]))
 		crop_masks.append(box_mask)
 
-	if 'occlusion' in state_manager.get_item('face_mask_types'):
-		occlusion_mask = create_occlusion_mask(crop_vision_frame)
-		crop_masks.append(occlusion_mask)
+	# if 'occlusion' in state_manager.get_item('face_mask_types'):
+	# 	occlusion_mask = create_occlusion_mask(crop_vision_frame)
+	# 	crop_masks.append(occlusion_mask)
 
 	pixel_boost_vision_frames = implode_pixel_boost(crop_vision_frame, pixel_boost_total, model_size)
 	for pixel_boost_vision_frame in pixel_boost_vision_frames:
@@ -443,9 +444,9 @@ def swap_face(source_face : Face, target_face : Face, temp_vision_frame : Vision
 		temp_vision_frames.append(pixel_boost_vision_frame)
 	crop_vision_frame = explode_pixel_boost(temp_vision_frames, pixel_boost_total, model_size, pixel_boost_size)
 
-	if 'region' in state_manager.get_item('face_mask_types'):
-		region_mask = create_region_mask(crop_vision_frame, state_manager.get_item('face_mask_regions'))
-		crop_masks.append(region_mask)
+	# if 'region' in state_manager.get_item('face_mask_types'):
+	# 	region_mask = create_region_mask(crop_vision_frame, state_manager.get_item('face_mask_regions'))
+	# 	crop_masks.append(region_mask)
 
 	crop_mask = numpy.minimum.reduce(crop_masks).clip(0, 1)
 	temp_vision_frame = paste_back(temp_vision_frame, crop_vision_frame, crop_mask, affine_matrix)
@@ -453,6 +454,7 @@ def swap_face(source_face : Face, target_face : Face, temp_vision_frame : Vision
 
 
 def forward_swap_face(source_face : Face, crop_vision_frame : VisionFrame) -> VisionFrame:
+	print("forward_swap_face")
 	face_swapper = get_inference_pool().get('face_swapper')
 	model_type = get_model_options().get('type')
 	face_swapper_inputs = {}
@@ -555,6 +557,7 @@ def get_reference_frame(source_face : Face, target_face : Face, temp_vision_fram
 
 
 def process_frame(inputs : FaceSwapperInputs) -> VisionFrame:
+	# print("process_frame(1)")
 	reference_faces = inputs.get('reference_faces')
 	source_face = inputs.get('source_face')
 	target_vision_frame = inputs.get('target_vision_frame')
@@ -568,8 +571,9 @@ def process_frame(inputs : FaceSwapperInputs) -> VisionFrame:
 		target_face = get_one_face(many_faces)
 		if target_face:
 			target_vision_frame = swap_face(source_face, target_face, target_vision_frame)
-	if state_manager.get_item('face_selector_mode') == 'reference':
-		similar_faces = find_similar_faces(many_faces, reference_faces, state_manager.get_item('reference_face_distance'))
+	if True:
+		# print("process_frame(2)")
+		similar_faces = find_similar_faces(many_faces, reference_faces, 0.3)
 		if similar_faces:
 			for similar_face in similar_faces:
 				target_vision_frame = swap_face(source_face, similar_face, target_vision_frame)
@@ -577,7 +581,8 @@ def process_frame(inputs : FaceSwapperInputs) -> VisionFrame:
 
 
 def process_frames(source_paths : List[str], queue_payloads : List[QueuePayload], update_progress : UpdateProgress) -> None:
-	reference_faces = get_reference_faces() if 'reference' in state_manager.get_item('face_selector_mode') else None
+	# print("process_frames(1)")
+	reference_faces = get_reference_faces() if 'reference' in ['reference'] else None
 	source_frames = read_static_images(source_paths)
 	source_faces = []
 
@@ -587,8 +592,10 @@ def process_frames(source_paths : List[str], queue_payloads : List[QueuePayload]
 		if temp_faces:
 			source_faces.append(get_first(temp_faces))
 	source_face = get_average_face(source_faces)
+	# print("process_frames(2)")
 
 	for queue_payload in process_manager.manage(queue_payloads):
+		
 		target_vision_path = queue_payload['frame_path']
 		target_vision_frame = read_image(target_vision_path)
 		output_vision_frame = process_frame(
@@ -597,12 +604,14 @@ def process_frames(source_paths : List[str], queue_payloads : List[QueuePayload]
 			'source_face': source_face,
 			'target_vision_frame': target_vision_frame
 		})
+		# print(target_vision_path)
 		write_image(target_vision_path, output_vision_frame)
+		# print("process_frames(3)")
 		update_progress(1)
 
 
 def process_image(source_paths : List[str], target_path : str, output_path : str) -> None:
-	reference_faces = get_reference_faces() if 'reference' in state_manager.get_item('face_selector_mode') else None
+	reference_faces = get_reference_faces() if 'reference' in ['reference'] else None
 	source_frames = read_static_images(source_paths)
 	source_faces = []
 

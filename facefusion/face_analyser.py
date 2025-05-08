@@ -106,7 +106,7 @@ def get_many_faces(vision_frames : List[VisionFrame]) -> List[Face]:
 				all_face_scores = []
 				all_face_landmarks_5 = []
 
-				for face_detector_angle in state_manager.get_item('face_detector_angles'):
+				for face_detector_angle in [0]:
 					if face_detector_angle == 0:
 						bounding_boxes, face_scores, face_landmarks_5 = detect_faces(vision_frame)
 					else:

@@ -114,19 +114,19 @@ def detect_faces(vision_frame : VisionFrame) -> Tuple[List[BoundingBox], List[Sc
 	all_face_landmarks_5 : List[FaceLandmark5] = []
 
 	if state_manager.get_item('face_detector_model') in [ 'many', 'retinaface' ]:
-		bounding_boxes, face_scores, face_landmarks_5 = detect_with_retinaface(vision_frame, state_manager.get_item('face_detector_size'))
+		bounding_boxes, face_scores, face_landmarks_5 = detect_with_retinaface(vision_frame, "1024x1024")
 		all_bounding_boxes.extend(bounding_boxes)
 		all_face_scores.extend(face_scores)
 		all_face_landmarks_5.extend(face_landmarks_5)
 
 	if state_manager.get_item('face_detector_model') in [ 'many', 'scrfd' ]:
-		bounding_boxes, face_scores, face_landmarks_5 = detect_with_scrfd(vision_frame, state_manager.get_item('face_detector_size'))
+		bounding_boxes, face_scores, face_landmarks_5 = detect_with_scrfd(vision_frame, "1024x1024")
 		all_bounding_boxes.extend(bounding_boxes)
 		all_face_scores.extend(face_scores)
 		all_face_landmarks_5.extend(face_landmarks_5)
 
-	if state_manager.get_item('face_detector_model') in [ 'many', 'yolo_face' ]:
-		bounding_boxes, face_scores, face_landmarks_5 = detect_with_yolo_face(vision_frame, state_manager.get_item('face_detector_size'))
+	if True:
+		bounding_boxes, face_scores, face_landmarks_5 = detect_with_yolo_face(vision_frame, "1024x1024")
 		all_bounding_boxes.extend(bounding_boxes)
 		all_face_scores.extend(face_scores)
 		all_face_landmarks_5.extend(face_landmarks_5)
@@ -152,7 +152,7 @@ def detect_with_retinaface(vision_frame : VisionFrame, face_detector_size : str)
 	feature_strides = [ 8, 16, 32 ]
 	feature_map_channel = 3
 	anchor_total = 2
-	face_detector_score = state_manager.get_item('face_detector_score')
+	face_detector_score = 0.5
 	face_detector_width, face_detector_height = unpack_resolution(face_detector_size)
 	temp_vision_frame = restrict_frame(vision_frame, (face_detector_width, face_detector_height))
 	ratio_height = vision_frame.shape[0] / temp_vision_frame.shape[0]
@@ -196,7 +196,7 @@ def detect_with_scrfd(vision_frame : VisionFrame, face_detector_size : str) -> T
 	feature_strides = [ 8, 16, 32 ]
 	feature_map_channel = 3
 	anchor_total = 2
-	face_detector_score = state_manager.get_item('face_detector_score')
+	face_detector_score = 0.5
 	face_detector_width, face_detector_height = unpack_resolution(face_detector_size)
 	temp_vision_frame = restrict_frame(vision_frame, (face_detector_width, face_detector_height))
 	ratio_height = vision_frame.shape[0] / temp_vision_frame.shape[0]
@@ -237,7 +237,7 @@ def detect_with_yolo_face(vision_frame : VisionFrame, face_detector_size : str) 
 	bounding_boxes = []
 	face_scores = []
 	face_landmarks_5 = []
-	face_detector_score = state_manager.get_item('face_detector_score')
+	face_detector_score = 0.5
 	face_detector_width, face_detector_height = unpack_resolution(face_detector_size)
 	temp_vision_frame = restrict_frame(vision_frame, (face_detector_width, face_detector_height))
 	ratio_height = vision_frame.shape[0] / temp_vision_frame.shape[0]

@@ -154,7 +154,7 @@ def validate_source_paths(source_paths : List[str]) -> Tuple[List[str], List[str
 
 
 def resolve_download_url(base_name : str, file_name : str) -> Optional[str]:
-	download_providers = state_manager.get_item('download_providers')
+	download_providers = ["github", "huggingface"]
 
 	for download_provider in download_providers:
 		download_url = resolve_download_url_by_provider(download_provider, base_name, file_name)

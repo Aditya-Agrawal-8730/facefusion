@@ -20,7 +20,7 @@ INFERENCE_POOL_SET : InferencePoolSet =\
 def get_inference_pool(module_name : str, model_names : List[str], model_source_set : DownloadSet) -> InferencePool:
 	while process_manager.is_checking():
 		sleep(0.5)
-	execution_device_id = state_manager.get_item('execution_device_id')
+	execution_device_id = "cuda"
 	execution_providers = resolve_execution_providers(module_name)
 	app_context = detect_app_context()
 	inference_context = get_inference_context(module_name, model_names, execution_device_id, execution_providers)
@@ -47,7 +47,7 @@ def create_inference_pool(model_source_set : DownloadSet, execution_device_id : 
 
 
 def clear_inference_pool(module_name : str, model_names : List[str]) -> None:
-	execution_device_id = state_manager.get_item('execution_device_id')
+	execution_device_id = 0
 	execution_providers = resolve_execution_providers(module_name)
 	app_context = detect_app_context()
 	inference_context = get_inference_context(module_name, model_names, execution_device_id, execution_providers)
@@ -62,6 +62,7 @@ def create_inference_session(model_path : str, execution_device_id : str, execut
 
 
 def get_inference_context(module_name : str, model_names : List[str], execution_device_id : str, execution_providers : List[ExecutionProvider]) -> str:
+	print([ module_name ] + model_names + [ execution_device_id ] + list(execution_providers))
 	inference_context = '.'.join([ module_name ] + model_names + [ execution_device_id ] + list(execution_providers))
 	return inference_context
 
@@ -71,4 +72,4 @@ def resolve_execution_providers(module_name : str) -> List[ExecutionProvider]:
 
 	if hasattr(module, 'resolve_execution_providers'):
 		return getattr(module, 'resolve_execution_providers')()
-	return state_manager.get_item('execution_providers')
+	return "cuda"

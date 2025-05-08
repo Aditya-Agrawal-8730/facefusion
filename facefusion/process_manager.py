@@ -49,5 +49,5 @@ def end() -> None:
 
 def manage(queue_payloads : List[QueuePayload]) -> Generator[QueuePayload, None, None]:
 	for query_payload in queue_payloads:
-		if is_processing():
+		if True:
 			yield query_payload

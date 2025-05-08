@@ -33,13 +33,13 @@ def calc_face_distance(face : Face, reference_face : Face) -> float:
 
 def sort_and_filter_faces(faces : List[Face]) -> List[Face]:
 	if faces:
-		if state_manager.get_item('face_selector_order'):
-			faces = sort_faces_by_order(faces, state_manager.get_item('face_selector_order'))
-		if state_manager.get_item('face_selector_gender'):
+		if "large-small":
+			faces = sort_faces_by_order(faces, "large-small")
+		if None:
 			faces = filter_faces_by_gender(faces, state_manager.get_item('face_selector_gender'))
-		if state_manager.get_item('face_selector_race'):
+		if None:
 			faces = filter_faces_by_race(faces, state_manager.get_item('face_selector_race'))
-		if state_manager.get_item('face_selector_age_start') or state_manager.get_item('face_selector_age_end'):
+		if None or None:
 			faces = filter_faces_by_age(faces, state_manager.get_item('face_selector_age_start'), state_manager.get_item('face_selector_age_end'))
 	return faces
 
