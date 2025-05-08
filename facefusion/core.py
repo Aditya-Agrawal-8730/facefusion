@@ -36,6 +36,7 @@ def cli() -> None:
 
 		if validate_args(program):
 			args = vars(program.parse_args())
+			# print(args)
 			apply_args(args, state_manager.init_item)
 
 			if state_manager.get_item('command'):
@@ -438,6 +439,7 @@ def process_video(start_time : float) -> ErrorCode:
 		return 1
 
 	temp_frame_paths = resolve_temp_frame_paths(state_manager.get_item('target_path'))
+	# print(state_manager.get_item('target_path'), temp_frame_paths[0], temp_frame_paths[-1])
 	if temp_frame_paths:
 		for processor_module in get_processors_modules(state_manager.get_item('processors')):
 			logger.info(wording.get('processing'), processor_module.__name__)

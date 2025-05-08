@@ -599,6 +599,8 @@ def process_frames(source_paths : List[str], queue_payloads : List[QueuePayload]
 		})
 		write_image(target_vision_path, output_vision_frame)
 		update_progress(1)
+		# print({'reference_faces': type(reference_faces), 'source_face': type(source_face), 'target_vision_frame': type(target_vision_frame)}, target_vision_path, type(output_vision_frame), numpy.array_equal(target_vision_frame, output_vision_frame))
+		# print("")
 
 
 def process_image(source_paths : List[str], target_path : str, output_path : str) -> None:
@@ -623,4 +625,5 @@ def process_image(source_paths : List[str], target_path : str, output_path : str
 
 
 def process_video(source_paths : List[str], temp_frame_paths : List[str]) -> None:
+	# print(type(state_manager))
 	processors.multi_process_frames(source_paths, temp_frame_paths, process_frames)

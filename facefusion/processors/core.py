@@ -54,6 +54,7 @@ def get_processors_modules(processors : List[str]) -> List[ModuleType]:
 
 
 def multi_process_frames(source_paths : List[str], temp_frame_paths : List[str], process_frames : ProcessFrames) -> None:
+	# print(state_manager.get_item('execution_thread_count'))
 	queue_payloads = create_queue_payloads(temp_frame_paths)
 	with tqdm(total = len(queue_payloads), desc = wording.get('processing'), unit = 'frame', ascii = ' =', disable = state_manager.get_item('log_level') in [ 'warn', 'error' ]) as progress:
 		progress.set_postfix(execution_providers = state_manager.get_item('execution_providers'))
